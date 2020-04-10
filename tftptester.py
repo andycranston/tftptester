@@ -1,9 +1,10 @@
 #
-# @(!--#) @(#) tftptester.py, version 005, 10-april-2020
+# @(!--#) @(#) tftptester.py, version 006, 10-april-2020
 #
 # a program to test TFTP server implmentations
 #
 
+#
 # Help from:
 # ---------
 #
@@ -124,6 +125,53 @@ def builddatablock(blocknum, blocksize, datastring):
     
 ##############################################################################
 
+def buildack(blocknum):
+    packet = bytearray(2 + 2)
+    
+    packet[0] = 0
+    packet[1] = 4
+    packet[2] = (blocknum & 0xFF00) >> 8
+    packet[3] = (blocknum & 0x00FF) >> 0
+
+    return packet
+
+##############################################################################
+
+def builderror(errorcode, errormsg):
+    packet = bytearray(2 + 2 + len(errormsg) + 1)
+    
+    packet[0] = 0
+    packet[1] = 5
+    packet[2] = (errorcode & 0xFF00) >> 8
+    packet[3] = (errorcode & 0x00FF) >> 0
+    
+    i = 4
+    for c in errormsg:
+        packet[i] = ord(c)
+        i += 1
+    packet[i] = 0
+    
+    return packet
+
+##############################################################################
+
+def buildraw(args):
+    packet = bytearray(len(args))
+    
+    i = 0
+    for arg in args:
+        if len(arg) == 1:
+            packet[i] = ord(arg)
+        elif len(arg) == 2:
+            packet[i] = int(arg, base=16)
+        else:
+            packet[i] = 0
+        i += 1
+    
+    return packet
+
+##############################################################################
+
 def processtestfile(testfile):
     global progname
     
@@ -179,6 +227,20 @@ def processtestfile(testfile):
             blocksize = int(args[1])
             datastring = args[2]
             packet = builddatablock(blocknum, blocksize, datastring)
+        elif cmd == 'ack':
+            blocknum = int(args[0])
+            packet = buildack(blocknum)
+        elif cmd == 'error':
+            errorcode = int(args[0])
+            errormsg = ''
+            for arg in args[1:]:
+                if errormsg == '':
+                    errormsg = arg
+                else:
+                    errormsg += ' ' + arg
+            packet = builderror(errorcode, errormsg)
+        elif cmd == 'raw':
+            packet = buildraw(args)
         elif cmd == 'show':
             showpacket(packet)
         elif cmd == 'send':
