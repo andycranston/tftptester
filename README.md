@@ -6,7 +6,7 @@ It is essentially a low-level TFTP client driven by a plain text file.  The file
 commands which build TFTP packets, sends them to the TFTP server under test and displays
 the response from the TFTP server.
 
-It can be used, for example, to simulate packet loss and observe how the TFTP server responds.
+It can be used, for example, to observe how a TFTP server responds to packet loss.
 
 ## Pre-requisites
 
@@ -35,7 +35,7 @@ will read commands from the file `test2.txt`.
 
 ## Format of the test file
 
-Lines in the test file can be one of:
+Lines in a test file can be one of:
 
 + Blank lines
 + Lines beginning with a # character
@@ -82,7 +82,7 @@ will set the timeout to two and a half seconds.
 
 ### rrq
 
-Build a Read ReQuest (RRQ) packet (but do not send it).  Requires a minumim of two arguments.  The first
+Build a Read ReQuest (RRQ) packet (but do not send it).  Requires a minimum of two arguments.  The first
 is the name of the file to be read.  The second is either `netascii` to request an ASCII file transfer or `octet` to request
 a binary file transfer.
 
@@ -94,7 +94,7 @@ Additional arguments can be specified which are options.  The TFTP protocol supp
 
 The `blksize` option specifies a different block size from the default of 512 bytes.
 
-The `tsize` option specifies the size of the transfer.
+The `tsize` option requests the size of the transfer.
 
 The `interval` option specifies how long to wait for a response.
 
@@ -159,6 +159,44 @@ repeated "two and a half times" as follows:
 ```
 marymaryma
 ```
+
+### ack
+
+Build an ACKnowledge packet (but do not send it).  Requires one argument which is the block number to
+acknowledge.  This can be between 0 and 65535 inclusive.
+
+### error
+
+Build an error packet (but do not send it).  Requires a minimum of two arguments.  The first is the error code which can
+be between 0 and 8 inclusive.  The second and other arguments make up the error string.  For example:
+
+```
+error 0 This is an error
+```
+
+### raw
+
+Build a packet of specific bytes.  Requires a minimum of one argument.  Each argument is converted to a byte value
+to build up the raw packet.  If an argument is a single character the ASCII value of the character is used.  If the argument
+is two characters long it is assumed to be a hexdecimal byte value.  Anything else results in a zero byte value.
+
+For example:
+
+```
+raw a 01 A 2 foo
+```
+
+produces a raw packet with these byte values (in hex):
+
+```
+61 01 41 32 00
+```
+
+As the hex ASCII value for 'a' is 61, 01 is 01, the hex ASCII value for 'A' is 61, the hex ASCII value for '2' is 32
+and foo falls into the "anything else" category and results in 00.
+
+The `raw` command can be used to build packets from scratch or build invalid packets just to see how
+the TFTP server reacts (if it reacts at all).
 
 ### show
 
