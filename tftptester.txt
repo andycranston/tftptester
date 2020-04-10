@@ -1,14 +1,6 @@
 ip 10.1.1.8
-port 69
 
-wrq file netascii
-show
-send
-sleep 1.0
-receive
-sleep 1.0
-
-data 1 512 andy
+wrq file octet
 show
 send
 sleep 1.0
