@@ -1,0 +1,24 @@
+#
+# example test file for the tftptester.py Python program
+#
+# write a file called `testfile` with 700 bytes of data using
+# binary transfer mode to a TFTP server at IP address 10.1.18
+
+ip 10.1.1.8
+
+wrq testfile octet
+show
+send
+receive
+
+data 1 512 andy
+show
+send
+receive
+
+data 2 188 cranston
+show
+send
+receive
+
+exit
