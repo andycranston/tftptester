@@ -1,5 +1,5 @@
 #
-# @(!--#) @(#) tftptester.py, version 004, 09-april-2020
+# @(!--#) @(#) tftptester.py, version 005, 10-april-2020
 #
 # a program to test TFTP server implmentations
 #
@@ -164,10 +164,10 @@ def processtestfile(testfile):
             break
         elif cmd == 'ip':
             ipaddr = args[0]
-        elif cmd == 'timeout':
-            timeout = float(args[0])
         elif cmd == 'port':
             destport = int(args[0])
+        elif cmd == 'timeout':
+            timeout = float(args[0])
         elif cmd == 'rrq':
             packet = buildrrq(args)
             destport = DEFAULT_PORT_NUMBER
