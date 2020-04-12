@@ -122,43 +122,31 @@ Build a Write ReQuest (WRQ) packet (but do not send it).  The arguments are the 
 
 ### data
 
-Build a data packet (but do not send it).  This requires three arguments.  The first is the block number.  This is a number between 1 and 65535.
-The second is the number of bytes of data in this block.  This is a number between 0 and the block size.  Block size is 512 bytes or the number specified
-as the `blksize` option on the Write ReQuest (WRA) packet.  The third argument is a string used to generate the data.  This string is simply repeated as many times as necessary
-to fill the data portion of the packet.
+Build a data packet (but do not send it).  This requires a minimum of three arguments.
+The first is the block number.  This is a number between 1 and 65535.
+The second is the number of bytes of data in this block.  This is a number
+between 0 and the block size.  Block size is 512 bytes or the number specified
+as the `blksize` option on the Write ReQuest (WRA) packet.  The rest of the arguments
+are strings used to generate the data.  The strings are simply repeated as many times
+as necessary to fill the data portion of the packet.
 
 For example:
 
 ```
-data 1 512 andy
+data 1 512 testing
 ```
 
-will build a data packet for block number 1 with 512 bytes of data.  The 512 bytes of data will be the string 'andy'
-repeated 128 times as follows:
-
-```
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-andyandyandyandyandyandyandyandyandyandyandyandyandyandyandyandy
-```
+will build a data packet for block number 1 with 512 bytes of data.  The 512 bytes of data will be the string 'testing' with an
+ASCII newline character repeated 64 times.
 
 Another example:
 
 ```
-data 2 10 mary
+data 2 27 Some more interesting data
 ```
 
-will build a data packet for block number 2 with 10 bytes of data.  The 10 bytes of data will be the string 'mary'
-repeated "two and a half times" as follows:
-
-```
-marymaryma
-```
+will build a data packet for block number 2 with 27 bytes of data.  The 27 bytes of data will be the string
+`Some more interesting data` followed by a newline (ASCII code 10) character.
 
 ### ack
 
@@ -231,22 +219,20 @@ transfer mode to a TFTP server running at IP address 10.1.1.8 on the standard we
 # example test file for the tftptester.py Python program
 #
 # write a file called `testfile` with 700 bytes of data using
-# binary transfer mode to a TFTP server at IP address 10.1.18
+# binary transfer mode to a TFTP server at IP address 10.1.1.5
+#
 
-ip 10.1.1.8
+ip 10.1.1.5
 
 wrq testfile octet
-show
 send
 receive
 
-data 1 512 andy
-show
+data 1 512 This is the first data block...
 send
 receive
 
-data 2 188 cranston
-show
+data 2 188 Second data block
 send
 receive
 
