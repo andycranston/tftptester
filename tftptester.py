@@ -1,5 +1,5 @@
 #
-# @(!--#) @(#) tftptester.py, version 006, 10-april-2020
+# @(!--#) @(#) tftptester.py, version 007, 12-april-2020
 #
 # a program to test TFTP server implmentations
 #
@@ -39,19 +39,19 @@ MAX_PACKET_SIZE          = 65536
 
 ##############################################################################
 
-def showpacket(bytes):
+def showpacket(bytes, prefix):
     bpr = 10              # bpr is Bytes Per Row
     
     numbytes = len(bytes)
 
     if numbytes == 0:
-        print("<empty packet>")
+        print('{} <empty packet>'.format(prefix))
     else:
         i = 0
         
         while i < numbytes:
             if (i % bpr) == 0:
-                print("{:04d} :".format(i), sep='', end='')
+                print("{} {:04d} :".format(prefix, i), sep='', end='')
                 chars = ''
             
             c = bytes[i]
@@ -108,13 +108,20 @@ def buildwrq(args):
     
 ##############################################################################
 
-def builddatablock(blocknum, blocksize, datastring):
+def builddatablock(blocknum, blocksize, datastrings):
     packet = bytearray(2 + 2 + blocksize)
     
     packet[0] = 0
     packet[1] = 3
     packet[2] = (blocknum & 0xFF00) >> 8
     packet[3] = (blocknum & 0x00FF) >> 0
+    
+    datastring = ''
+    for d in datastrings:
+        if datastring != '':
+            datastring += ' '
+        datastring += d
+    datastring += '\n'
     
     i = 4
     while i < (4 + blocksize):
@@ -225,8 +232,8 @@ def processtestfile(testfile):
         elif cmd == 'data':
             blocknum = int(args[0])
             blocksize = int(args[1])
-            datastring = args[2]
-            packet = builddatablock(blocknum, blocksize, datastring)
+            datastrings = args[2:]
+            packet = builddatablock(blocknum, blocksize, datastrings)
         elif cmd == 'ack':
             blocknum = int(args[0])
             packet = buildack(blocknum)
@@ -242,8 +249,9 @@ def processtestfile(testfile):
         elif cmd == 'raw':
             packet = buildraw(args)
         elif cmd == 'show':
-            showpacket(packet)
+            showpacket(packet, '-')
         elif cmd == 'send':
+            showpacket(packet, '>')
             sock.sendto(packet, (ipaddr, destport))
         elif cmd == 'receive':
             ready, dummy1, dummy2 = select.select([sock], [], [], timeout)    
@@ -252,7 +260,7 @@ def processtestfile(testfile):
             else:
                 inpacket, server = sock.recvfrom(MAX_PACKET_SIZE)
                 destport = server[1]
-                showpacket(inpacket)            
+                showpacket(inpacket, '<')            
         elif cmd == 'sleep':
             duration = args[0]
             time.sleep(float(duration))
