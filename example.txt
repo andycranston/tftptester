@@ -2,22 +2,20 @@
 # example test file for the tftptester.py Python program
 #
 # write a file called `testfile` with 700 bytes of data using
-# binary transfer mode to a TFTP server at IP address 10.1.18
+# binary transfer mode to a TFTP server at IP address 10.1.1.5
+#
 
-ip 10.1.1.8
+ip 10.1.1.5
 
 wrq testfile octet
-show
 send
 receive
 
-data 1 512 andy
-show
+data 1 512 This is the first data block...
 send
 receive
 
-data 2 188 cranston
-show
+data 2 188 Second data block
 send
 receive
 
